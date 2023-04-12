@@ -22,8 +22,8 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
-    ArrayList<String> items = new ArrayList<>();
-    static ArrayList<String> originalSort = new ArrayList<>();
+    static ArrayList<String> items = new ArrayList<>();
+    static ArrayList<String> sortedData = new ArrayList<>();
 
     ActivityResultLauncher<Intent> launchActivityForResult = registerForActivityResult(
         new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
@@ -35,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
                         ViewAdapter adapter = (ViewAdapter) recyclerView.getAdapter();
                         if (adapter != null) {
                             items.add(item);
-                            originalSort.add(item);
-                            adapter.notifyItemInserted(adapter.listItems.size() - 1);
+                            sortedData.add(item);
+                            adapter.notifyItemInserted(items.size());
                         }
                     }
                 }
@@ -50,55 +50,51 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
 
+        items.add("Banaanit");
+        items.add("Aurinkorasva");
+        items.add("Omenat");
+        items.add("Kahvi");
+        items.add("Jäätelö");
+        items.add("Yhden tähden jallupullo");
 
-        items.add("Maitoa");
+        sortedData.addAll(items);
 
         ViewAdapter adapter = new ViewAdapter(this, items);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        items.add("Aurinkorasva");
-        items.add("Kahvia");
-        items.add("Karkkia");
-        items.add("Jäätelöä");
-
     }
 
     public void addItem(View view) {
+        // launch new activity to add item
+        // result handled in onActivityResult
         Intent intent = new Intent(this, AddItemActivity.class);
         launchActivityForResult.launch(intent);
     }
 
     public void sortByTime(View view) {
-        if (!originalSort.equals(items)) {
-            for (String item : items) {
-                if (!originalSort.contains(item)) {
-                    originalSort.add(item);
-                }
-            }
-        }
-
+        sortedData.clear();
+        sortedData.addAll(items);
+        System.out.println(sortedData);
         ViewAdapter adapter = (ViewAdapter) recyclerView.getAdapter();
+        // sort by time, oldest first
         if (adapter != null) {
-            for (int i = 0; i < items.size(); i++) {
-                items.set(i, originalSort.get(i));
-            }
-            adapter.notifyItemRangeChanged(0, adapter.listItems.size());
+            System.out.println(sortedData);
+            adapter.listItems = sortedData;
+            adapter.notifyDataSetChanged();
         }
     }
 
     public void sortByAlphabet(View view) {
-        if (!originalSort.equals(items)) {
-            for (String item : items) {
-                if (!originalSort.contains(item)) {
-                    originalSort.add(item);
-                }
-            }
-        }
-
+        sortedData.clear();
+        sortedData.addAll(items);
+        System.out.println(sortedData);
         ViewAdapter adapter = (ViewAdapter) recyclerView.getAdapter();
+        // sort by alphabet, A-z
         if (adapter != null) {
-            Collections.sort(items);
-            adapter.notifyItemRangeChanged(0, adapter.listItems.size());
+            Collections.sort(sortedData);
+            System.out.println(sortedData);
+            adapter.listItems = sortedData;
+            adapter.notifyDataSetChanged();
         }
     }
 

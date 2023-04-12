@@ -25,6 +25,7 @@ public class AddItemActivity extends AppCompatActivity {
     }
 
     public void addItem(View view) {
+        // get the input from the EditText field and pass it back to main activity
         inputField = findViewById(R.id.inputItem);
         String input = inputField.getText().toString();
         Intent intent = new Intent();

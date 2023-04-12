@@ -14,6 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.Objects;
+
+import kotlinx.coroutines.MainCoroutineDispatcher;
 
 public class ViewAdapter extends RecyclerView.Adapter<ViewAdapter.ViewHolder> {
 
@@ -60,12 +63,23 @@ public class ViewAdapter extends RecyclerView.Adapter<ViewAdapter.ViewHolder> {
     }
 
     public void deleteItem(int position) {
-        listItems.remove(position);
-        MainActivity.originalSort.remove(position);
-        notifyItemRemoved(position);
+        // get position of item to remove on the screen and relative position in datalists
+        String itemToRemove = listItems.get(position);
+        int indexToRemove = MainActivity.items.indexOf(itemToRemove);
+        int sortedIndexToRemove = MainActivity.sortedData.indexOf(itemToRemove);
+
+        System.out.println("Index to remove: " + indexToRemove);
+        System.out.println("Sorted index to remove: " + sortedIndexToRemove);
+
+        if (indexToRemove >= 0 && sortedIndexToRemove >= 0) {
+            MainActivity.items.remove(indexToRemove);
+            MainActivity.sortedData.remove(sortedIndexToRemove);
+            notifyDataSetChanged();
+        }
     }
 
     public void editItem(int position) {
+        // launch a dialog to edit the item and update the data
         final EditText input = new EditText(context);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Muuta tuotetta");
@@ -73,8 +87,10 @@ public class ViewAdapter extends RecyclerView.Adapter<ViewAdapter.ViewHolder> {
 
         builder.setPositiveButton("OK", (dialogInterface, i) -> {
             String item = input.getText().toString();
-            listItems.set(position, item);
-            MainActivity.originalSort.set(position, item);
+            int indexToChange = MainActivity.items.indexOf(listItems.get(position));
+            int sortedIndexToChange = MainActivity.sortedData.indexOf(listItems.get(position));
+            MainActivity.items.set(indexToChange, item);
+            MainActivity.sortedData.set(sortedIndexToChange, item);
             notifyItemChanged(position);
         });
         builder.setNegativeButton("Takaisin", (dialogInterface, i) -> dialogInterface.cancel());
